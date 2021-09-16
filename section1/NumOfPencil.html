@@ -1,18 +1,17 @@
-<!DOCTYPE html>
-<html lang = "ko">
+<html>
     <head>
         <meta charset="UTF-8">
         <title>출력결과</title>
     </head>
     <body>
         <script>
-            function solution(a, b, c){
+            function solution(n){
                 let answer;
-                answer = a >= b ? b : a;
-                answer = answer >= c ? c : answer;
+                answer = Math.ceil(n/12);
                 return answer;
             }
-            console.log(solution(2, 1, 3));
+
+            console.log(solution(24));
         </script>
     </body>
 </html>
