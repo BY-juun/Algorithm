@@ -1,0 +1,28 @@
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>출력결과</title>
+    </head>
+    <body>
+        <script>
+            function solution(s){
+                let answer="YES";
+                for(let i=0;i<Math.ceil(s.length/2);i++){
+                    const front = s[i].toLowerCase(), back = s[s.length-1-i].toLowerCase();
+                    if(front === back) answer = "YES";
+                    else{
+                        answer = "NO";
+                        break;
+                    }
+                }
+                return answer;
+            }
+            
+            let str="gqoqGd";
+            console.log(solution(str));
+        </script>
+    </body>
+</html>
+
+
+
