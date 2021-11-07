@@ -1,0 +1,32 @@
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>출력결과</title>
+    </head>
+    <body>
+        <script>
+            function solution(m, product){
+                let answer=0;
+                let price = product.sort((a,b)=>(a[0]+a[1])-(b[0]+b[1]));
+                for(let coupon = 0; coupon < price.length; coupon++){
+                    price[coupon][0] /= 2;
+                    let count = 0;
+                    let money = 0;
+                    for(let i=0;i<price.length;i++){
+                        if(money + price[i][0] + price[i][1] <= m){
+                            count ++ ;
+                            money = money + price[i][0] + price[i][1];
+                        }
+                    }
+                    if(count > answer) answer = count;
+                    price[coupon][0] *= 2;
+                }
+                console.log(price);
+                return answer;
+            }
+            
+            let arr=[[6, 6], [2, 2], [4, 3], [4, 5], [10, 3]];
+            console.log(solution(28, arr));
+        </script>
+    </body>
+</html>
