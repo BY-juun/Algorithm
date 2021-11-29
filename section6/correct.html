@@ -1,0 +1,30 @@
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>출력결과</title>
+    </head>
+    <body>
+        <script>
+            function solution(s){
+                let answer="YES";
+                let result = 0;
+                for(let x of s){
+                    if(x === '('){
+                        result++;
+                    }else if(x === ')'){
+                        result--;
+                        if(result < 0){
+                            answer = "NO";
+                            break;
+                        }
+                    }
+                }
+                if(result !== 0) answer = "NO"
+                return answer;
+            }
+            
+            let a="(()()))";
+            console.log(solution(a));
+        </script>
+    </body>
+</html>
