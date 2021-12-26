@@ -1,0 +1,35 @@
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>출력결과</title>
+    </head>
+    <body>
+        <script>
+            function solution(n, k){
+                let answer;
+                let queue=Array.from({length:n}, (v, i)=>i+1); 
+                while(true){
+                    let count = 1;
+                    while(true){
+                        if(count === k){
+                            queue.shift();
+                            count = 1;
+                            break;
+                        } 
+                        else{
+                            queue.push(queue.shift());
+                        }
+                        count++;
+                    }
+                    if(queue.length === 1)
+                        break;
+                }
+                answer = queue[0];
+                return answer;
+                
+            }
+
+            console.log(solution(8, 3));
+        </script>
+    </body>
+</html>
