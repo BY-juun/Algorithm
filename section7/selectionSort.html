@@ -1,0 +1,29 @@
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>출력결과</title>
+    </head>
+    <body>
+        <script>
+            function solution(arr){
+                let answer=arr;
+                let temp;
+                for(let i=0;i<arr.length-1;i++){
+                    let minIndex = i;
+                    for(let j=i+1;j<arr.length;j++){
+                        if(arr[minIndex] > arr[j]) minIndex = j;
+                    }
+                    if(minIndex !== i){
+                        temp = arr[i];
+                        arr[i] = arr[minIndex];
+                        arr[minIndex] = temp;
+                    }
+                }
+                return answer;
+            }
+
+            let arr=[13, 5, 11, 7, 23, 15];
+            console.log(solution(arr));
+        </script>
+    </body>
+</html>
