@@ -1,0 +1,48 @@
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>출력결과</title>
+    </head>
+    <body>
+        <script>
+            function count(stable, dist){
+                let counter = 1;
+                let ep = stable[0];
+                for(let x of stable){
+                    if(x-ep >= dist){
+                        ep = x;
+                        counter++;
+                    }
+                }
+                return counter;
+            }
+            function solution(c, stable){
+                let answer;
+                stable.sort((a,b) => a-b);
+                let rt = stable[stable.length - 1] - stable[0];
+                let lt = stable[1] - stable[0];
+                for(let i=1;i<stable.length - 1; i++){
+                    let distance = stable[i+1] - stable[i];
+                    if(distance < lt) lt = distance;
+                }
+
+                while(lt <= rt){
+                    let mid = Math.floor((lt+rt)/2);
+                    let check = count(stable,mid);
+                    if(check < c) rt = mid-1;
+                    else if(check > c) lt = mid+1;
+                    else{
+                        answer = mid;
+                        lt = mid+1;
+                    }
+                }
+
+                return answer;
+            }
+
+            let arr=[1, 2, 8, 4, 9];
+            console.log(solution(3, arr));
+        </script>
+    </body>
+</html>
+
