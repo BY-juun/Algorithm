@@ -1,0 +1,24 @@
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>출력결과</title>
+    </head>
+    <body>
+        <script>
+            function print_binary(n,answer){
+                if(n > 0){
+                    print_binary(Math.floor(n/2),answer);
+                    answer += String(n%2);
+                    console.log(answer);
+                }
+            }
+            function solution(n){
+                let answer = "";
+                print_binary(n,answer);
+                return answer;
+            }
+
+            console.log(solution(11));
+        </script>
+    </body>
+</html>
