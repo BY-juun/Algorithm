@@ -1,0 +1,32 @@
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>출력결과</title>
+    </head>
+    <body>
+        <script>
+            function solution(m, arr){
+                let answer=Number.MAX_SAFE_INTEGER;
+                let n=arr.length;
+                function DFS(L, sum, count){
+                    if(L === n) return;
+                    if(sum > m) return;
+                    else if(sum === m){
+                        if(answer > count) answer = count;
+                    }
+                    else{
+                        for(let i=L;i<n;i++){
+                            DFS(i,sum+arr[i], count+1);
+                        }
+                        DFS(L+1,sum,count);
+                    }
+                }
+                DFS(0, 0, 0);
+                return answer;
+            }
+
+            let arr=[1, 2, 5];
+            console.log(solution(15, arr));
+        </script>
+    </body>
+</html>
