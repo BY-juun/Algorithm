@@ -1,0 +1,41 @@
+
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>출력결과</title>
+    </head>
+    <body>
+        <script>
+            function solution(m, arr){         
+                let answer=[];
+                n=arr.length;
+                let ch=Array.from({length:n-1}, ()=>0);
+                let tmp=[];
+                function DFS(L,count){
+                    if(L === n) return;
+                    if(count === m+1){
+                        ch = ch.slice();
+                        if(answer.indexOf(ch)){
+                            console.log(ch);
+                            answer.push(ch);
+                        }
+                        return;
+                    }
+                    else{
+                        ch[count-1] = arr[L];
+                        for(let i=0;i<n;i++){
+                            DFS(i,count+1);
+                        }
+                        ch[count-1] = 0;
+                        DFS(L+1,count);
+                    }
+                }
+                DFS(0,1);
+                return answer;
+            }
+
+            let arr=[3, 6, 9];
+            console.log(solution(2, arr));
+        </script>
+    </body>
+</html>
