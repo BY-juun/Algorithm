@@ -1,0 +1,46 @@
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>출력결과</title>
+    </head>
+    <body>
+        <script>
+            function solution(board){  
+                let answer=0;
+                let dx=[-1, 0, 1, 0];
+                let dy=[0, 1, 0, -1];
+                function DFS(x, y){
+                    //if(x < 0 || y < 0 || x === board.length || y=== board.length) return;
+                    if(x === board.length-1 && y === board.length-1){
+                        answer++;
+                        return;
+                    }
+                    else{
+                        for(let i=0;i<4;i++){
+                            if(x+dx[i] >= 0 && y+dy[i] >= 0 && x+dx[i] < board.length && y+dy[i] < board.length){
+                                if(!board[x+dx[i]][y+dy[i]]){
+                                    board[x][y] = 1;
+                                    DFS(x+dx[i],y+dy[i]);
+                                    board[x][y] = 0;
+                                }
+                            }
+                        }
+                    }
+                }
+                board[0][0]=1;
+                DFS(0, 0);
+                return answer;
+            }
+
+            let arr=[[0, 0, 0, 0, 0, 0, 0], 
+                     [0, 1, 1, 1, 1, 1, 0],
+                     [0, 0, 0, 1, 0, 0, 0],
+                     [1, 1, 0, 1, 0, 1, 1],
+                     [1, 1, 0, 0, 0, 0, 1],
+                     [1, 1, 0, 1, 1, 0, 0],
+                     [1, 0, 0, 0, 0, 0, 0]];
+
+            console.log(solution(arr));
+        </script>
+    </body>
+</html>
