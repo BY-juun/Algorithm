@@ -5,24 +5,31 @@ let col;
 let dx = [-1, 0, 1];
 let dy = [1, 1, 1];
 let answer;
+let check = 0;
 
 const solve = () => {
   for (let i = 0; i < graph.length; i++) {
+    check = 0;
     DFS(i, 0);
   }
-
-  console.log(answer);
+  let result = 0;
+  answer.forEach((value) => {
+    if (value === 1) result++;
+  });
+  console.log(result);
 };
 
 function DFS(i, j) {
   isVisited[i][j] = 1;
+  if (check === 1) return;
   if (j === col - 1) {
+    check = 1;
     answer[i] = 1;
     return;
   }
   for (let k = 0; k < 3; k++) {
     if (i + dx[k] >= 0 && i + dx[k] < row && j + dy[k] >= 0 && j + dy[k] < col) {
-      if (graph[i + dx[k]][j + dy[k]] === 0 && isVisited[i + dx[k]][j + dy[k]] === 0) {
+      if (graph[i + dx[k]][j + dy[k]] === 0 && isVisited[i + dx[k]][j + dy[k]] === 0 && check === 0) {
         DFS(i + dx[k], j + dy[k]);
       }
     }
