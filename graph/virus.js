@@ -1,92 +1,71 @@
 let graph = [];
-let temp;
 let isVisited = [];
-let tempIsVisted = [];
-let row;
-let col;
-let dx = [-1, 0, 1, 0];
-let dy = [0, -1, 0, 1];
+let row, col;
+let tempArr;
+let direction;
+let dx = [0, 0, 1, -1];
+let dy = [1, -1, 0, 0];
 
 const solve = () => {
+  let totalLength = row * col;
   let answer = 0;
-  let num;
-  temp = graph;
-  for (let i = 0; i < row; i++) {
-    for (let j = 0; j < col; j++) {
-      if (temp[i][j] === 0) {
-        temp[i][j] = 1;
-        for (let k = i; k < row; k++) {
-          for (let u = j; u < col; u++) {
-            if (temp[k][u] === 0) {
-              temp[k][u] = 1;
-              for (let p = k; p < row; p++) {
-                for (let q = u; q < col; q++) {
-                  if (temp[p][q] === 0) {
-                    temp[p][q] = 1;
-                    console.log(temp);
-                    copy();
-                    virus();
-                    num = findSafeArea();
-                    //console.log(num);
-                    if (num > answer) answer = num;
-                  }
-                  temp[p][q] = 0;
-                }
-              }
+  for (let i = 0; i < totalLength; i++) {
+    //console.log(graph);
+    if (graph[i] === 0) {
+      graph[i] = 1; //벽 세우기
+      for (let j = i + 1; j < totalLength; j++) {
+        if (graph[j] === 0) {
+          graph[j] = 1; //벽 세우기
+          for (let k = j + 1; k < totalLength; k++) {
+            if (graph[k] === 0) {
+              graph[k] = 1; //벽 세우기 (3개 다 세움)
+              tempArr = [...graph];
+
+              spreadVirus();
+              const result = findSafeArea();
+              if (result > answer) answer = result;
             }
-            temp[k][u] = 0;
+            graph[k] = 0;
           }
         }
+        graph[j] = 0;
       }
-      temp[i][j] = 0;
     }
+    graph[i] = 0;
   }
   console.log(answer);
 };
 
-const copy = () => {
-  for (let i = 0; i < row; i++) {
-    tempIsVisted[i] = [...temp[i]];
-  }
-};
-
-const virus = () => {
-  for (let i = 0; i < row; i++) {
-    for (let j = 0; j < col; j++) {
-      if (tempIsVisted[i][j] === 2) {
-        BFS(i, j);
-      }
+const spreadVirus = () => {
+  for (let i = 0; i < row * col; i++) {
+    if (tempArr[i] === 2) {
+      DFS(i);
     }
   }
 };
 
-const BFS = (i, j) => {
-  let queue = [];
-  queue.push([i, j]);
-  while (queue.length > 0) {
-    let [x, y] = queue.shift();
-    for (let t = 0; t < 4; t++) {
-      if (x + dx[t] >= 0 && y + dy[t] >= 0 && x + dx[t] < row && y + dy[t] < col) {
-        if (tempIsVisted[x + dx[t]][y + dy[t]] === 0) {
-          tempIsVisted[x + dx[t]][y + dy[t]] = 2;
-          queue.push([x + dx[t], y + dy[t]]);
-        }
+const DFS = (pos) => {
+  let xPos = pos / col;
+  let yPos = pos % col;
+  for (let i = 0; i < 4; i++) {
+    if (xPos + dx[i] >= 0 && xPos + dx[i] < row && yPos + dy[i] >= 0 && yPos + dy[i] < col) {
+      let findPos = (xPos + dx[i]) * col + (yPos + dy[i]);
+      if (tempArr[findPos] === 0) {
+        tempArr[findPos] = 2;
+        DFS(findPos);
       }
     }
   }
 };
 
 const findSafeArea = () => {
-  let safeZone = 0;
-  for (let i = 0; i < row; i++) {
-    for (let j = 0; j < col; j++) {
-      if (tempIsVisted[i][j] === 0) safeZone++;
-    }
+  let safeArea = 0;
+  for (let i = 0; i < row * col; i++) {
+    if (tempArr[i] === 0) safeArea++;
   }
-  return safeZone;
+  return safeArea;
 };
 
-const { copyFile } = require("fs");
 const readline = require("readline");
 const rl = readline.createInterface({
   input: process.stdin,
@@ -99,12 +78,12 @@ rl.on("line", function (line) {
   [row, col] = input[0].split(" ").map((value) => Number(value));
   input = input.slice(1);
   for (let i = 0; i < row; i++) {
-    let temp = [];
-    input[i].split(" ").map((value) => temp.push(Number(value)));
-    graph.push(temp);
-    isVisited.push(temp);
-    tempIsVisted.push(temp);
+    input[i].split(" ").map((value) => {
+      graph.push(Number(value));
+      isVisited.push(Number(value));
+    });
   }
+  direction = [col, -col, +1, -1];
   solve();
   process.exit();
 });
