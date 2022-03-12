@@ -1,70 +1,29 @@
 let graph = [];
-let isVisited = [];
-let row, col;
-let tempArr;
-let dx = [0, 0, 1, -1];
-let dy = [1, -1, 0, 0];
+let isVisited;
+let numOfComputer;
+let bridge;
 
-const solve = () => {
-  let totalLength = row * col;
-  let answer = 0;
-  for (let i = 0; i < totalLength; i++) {
-    if (graph[i] === 0) {
-      graph[i] = 1; //벽 세우기
-      for (let j = i + 1; j < totalLength; j++) {
-        if (graph[j] === 0) {
-          graph[j] = 1; //벽 세우기
-          for (let k = j + 1; k < totalLength; k++) {
-            if (graph[k] === 0) {
-              graph[k] = 1; //벽 세우기 (3개 다 세움)
-              tempArr = [...graph];
-              spreadVirus();
-              const result = findSafeArea();
-              if (result > answer) {
-                answer = result;
-                console.log(tempArr);
-              }
-              graph[k] = 0;
-            }
-          }
-          graph[j] = 0;
-        }
-      }
-      graph[i] = 0;
+function solve() {
+  isVisited[1] = 1;
+  for (let i = 0; i < bridge; i++) {
+    if (graph[i][0] === 1 && !isVisited[graph[i][1]]) {
+      DFS(graph[i][1]);
+    }
+    if (graph[i][1] === 1 && !isVisited[graph[i][0]]) {
+      DFS(graph[i][0]);
     }
   }
-  console.log(answer);
-};
+  isVisited = isVisited.filter((value) => value === 1);
+  console.log(isVisited.length - 1);
+}
 
-const spreadVirus = () => {
-  for (let i = 0; i < row * col; i++) {
-    if (tempArr[i] === 2) {
-      DFS(i);
-    }
+function DFS(n) {
+  isVisited[n] = 1;
+  for (let i = 0; i < bridge; i++) {
+    if (graph[i][0] === n && !isVisited[graph[i][1]]) DFS(graph[i][1]);
+    if (graph[i][1] === n && !isVisited[graph[i][0]]) DFS(graph[i][0]);
   }
-};
-
-const DFS = (pos) => {
-  let xPos = pos / col;
-  let yPos = pos % col;
-  for (let i = 0; i < 4; i++) {
-    if (xPos + dx[i] >= 0 && xPos + dx[i] < row && yPos + dy[i] >= 0 && yPos + dy[i] < col) {
-      let findPos = (xPos + dx[i]) * col + (yPos + dy[i]);
-      if (tempArr[findPos] === 0) {
-        tempArr[findPos] = 2;
-        DFS(findPos);
-      }
-    }
-  }
-};
-
-const findSafeArea = () => {
-  let safeArea = 0;
-  for (let i = 0; i < row * col; i++) {
-    if (tempArr[i] === 0) safeArea++;
-  }
-  return safeArea;
-};
+}
 
 const readline = require("readline");
 const rl = readline.createInterface({
@@ -75,13 +34,14 @@ let input = [];
 rl.on("line", function (line) {
   input.push(line);
 }).on("close", function () {
-  [row, col] = input[0].split(" ").map((value) => Number(value));
-  input = input.slice(1);
-  for (let i = 0; i < row; i++) {
-    input[i].split(" ").map((value) => {
-      graph.push(Number(value));
-      isVisited.push(Number(value));
-    });
+  numOfComputer = Number(input[0]);
+  bridge = Number(input[1]);
+  input = input.slice(2);
+  isVisited = Array.from({ length: numOfComputer }, () => 0);
+  for (let i = 0; i < bridge; i++) {
+    let temp = [];
+    input[i].split(" ").map((value) => temp.push(Number(value)));
+    graph.push(temp);
   }
   solve();
   process.exit();
