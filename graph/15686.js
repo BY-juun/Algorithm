@@ -1,79 +1,41 @@
 let graph = [];
-let NoChicken = [];
+let chicken = [];
 let m, n;
-let IsVisited;
-const dx = [0, -1, 1, 0];
-const dy = [-1, 0, 0, 1];
 let answer = Number.MAX_SAFE_INTEGER;
+
 function solve() {
-  let count;
-  for (let i = 0; i < n; i++) {
-    for (let j = 0; j < n; j++) {
-      if (graph[i][j] === 2) {
-        count = 1;
-        combination(count, i, j);
-      }
-    }
-  }
-  console.log(answer);
+  let count = 0;
+  let idx = 0;
+  let arr = [];
+  combination(arr, count, idx);
 }
 
-function combination(count, x, y) {
-  if (count > m) return;
-  NoChicken[x][y] = 2;
-  const findResult = findAnswer();
-  if (findResult < answer) answer = findResult;
-  const startPos = x * n + y;
-  for (let i = startPos + 1; i < n * n; i++) {
-    let tempX = parseInt(i / n);
-    let tempY = parseInt(i % n);
-    if (graph[tempX][tempY] === 2) {
-      combination(count + 1, tempX, tempY);
-    }
-  }
-  NoChicken[x][y] = 0;
+function combination(arr, count, idx) {
+  if (idx >= chicken.length) return;
+  if (count >= m) return;
+  arr.push(chicken[idx]);
+  findDist(arr);
+  combination(arr, count + 1, idx + 1);
+  arr.pop();
+  combination(arr, count, idx + 1);
 }
 
-function findAnswer() {
+function findDist(arr) {
   let result = 0;
   for (let i = 0; i < n; i++) {
     for (let j = 0; j < n; j++) {
-      if (NoChicken[i][j] === 1) {
-        Initialize();
-        result += BFS(i, j);
-      }
-    }
-  }
-  return result;
-}
-
-function BFS(x, y) {
-  let queue = [];
-  queue.push([x, y]);
-  IsVisited[x][y] = 1;
-
-  while (queue.length !== 0) {
-    let [xPos, yPos] = queue.shift();
-    if (NoChicken[xPos][yPos] === 2) {
-      return Math.abs(xPos - x) + Math.abs(yPos - y);
-    }
-    for (let i = 0; i < 4; i++) {
-      if (xPos + dx[i] >= 0 && xPos + dx[i] < n && yPos + dy[i] >= 0 && yPos + dy[i] < n) {
-        if (!IsVisited[xPos + dx[i]][yPos + dy[i]]) {
-          IsVisited[xPos + dx[i]][yPos + dy[i]] = 1;
-          queue.push([xPos + dx[i], yPos + dy[i]]);
+      if (graph[i][j] === 1) {
+        let temp = Number.MAX_SAFE_INTEGER;
+        for (let chic of arr) {
+          const [xPos, yPos] = chic;
+          const dist = Math.abs(xPos - i) + Math.abs(yPos - j);
+          if (dist < temp) temp = dist;
         }
+        result += temp;
       }
     }
   }
-}
-
-function Initialize() {
-  for (let i = 0; i < n; i++) {
-    for (let j = 0; j < n; j++) {
-      IsVisited[i][j] = 0;
-    }
-  }
+  if (result < answer) answer = result;
 }
 
 const readline = require("readline");
@@ -89,19 +51,19 @@ rl.on("line", function (line) {
   input = input.slice(1);
   IsVisited = Array.from({ length: n }, () => Array.from({ length: n }, () => 0));
   for (let i = 0; i < n; i++) {
-    let temp = [];
-    let temp2 = [];
-    input[i].split(" ").map((value) => temp.push(parseInt(value)));
-    input[i].split(" ").map((value) => {
-      if (Number(value) === 2) {
-        temp2.push(0);
-      } else {
-        temp2.push(Number(value));
-      }
-    });
-    NoChicken.push(temp2);
+    let temp = input[i].split(" ").map((value) => Number(value));
     graph.push(temp);
   }
+
+  for (let i = 0; i < n; i++) {
+    for (let j = 0; j < n; j++) {
+      if (graph[i][j] === 2) {
+        chicken.push([i, j]);
+        graph[i][j] = 0;
+      }
+    }
+  }
   solve();
+  console.log(answer);
   process.exit();
 });
