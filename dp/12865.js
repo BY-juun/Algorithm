@@ -14,17 +14,18 @@ const solve = () => {
   //       solve(i + 1, remain, sum);
   //     }
   //   }
-  let dp = Array.from({ length: n + 1 }, () => Array.from({ length: k }, () => 0));
-  for (let i = 1; i < n; i++) {
+  let dp = Array.from({ length: n + 1 }, () => Array.from({ length: m + 1 }, () => 0));
+  for (let i = 1; i <= n; i++) {
     const [weight, value] = arr[i];
-    for (let j = 0; j <= k; j++) {
-      if (weight < k) {
-        dp[i][k] = dp[i - 1][k];
+    for (let j = 0; j <= m; j++) {
+      if (j < weight) {
+        dp[i][j] = dp[i - 1][j];
       } else {
-        dp[i][k] = Math.max(dp[i - 1][k], dp[i - 1][k - value]);
+        dp[i][j] = Math.max(dp[i - 1][j], dp[i - 1][j - weight] + value);
       }
     }
   }
+  console.log(dp[n][m]);
 };
 
 const readline = require("readline");
@@ -39,7 +40,9 @@ rl.on("line", function (line) {
     let temp = x.split(" ").map((value) => Number(value));
     arr.push(temp);
   }
-  arr.sort((a, b) => a - b);
+  arr.sort((a, b) => {
+    return a[0] - b[0];
+  });
   arr.unshift(0);
   solve();
   //console.log(answer);
