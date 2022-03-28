@@ -1,8 +1,7 @@
 let n, e;
 
-let should = [];
 let isVisited;
-
+let arr;
 
 
 const getMin = (vertex) => {
@@ -17,38 +16,33 @@ const getMin = (vertex) => {
 	return idx;
 };
 
-function solve(arr, startPos, endPos) {
-	if (startPos === endPos) return 0;
+function solve(startPos) {
 	let v = arr[startPos - 1];
 	let count = 0;
 	let end = v.length;
 	let min = 0;
 	let startV = v;
+	isVisited[startPos - 1] = true;
+
 	while (count < end) {
 		const idx = getMin(startV);
 		min += startV[idx];
 		const next = arr[idx];
 		for (let i = 0; i < v.length; i++) {
-			if (v[i] > next[i] + min) {
+			if (v[i] > next[i] + min && !isVisited[i]) {
 				v[i] = next[i] + min;
 			}
 		}
 		startV = arr[idx];
+		isVisited[idx] = true;
 		count++;
 	}
-	return v[endPos - 1];
+	console.log(v);
 }
 
-function copyArray(arr) {
-	let CopyArr = [];
-	for (let x of arr) {
-		let temp = [...x];
-		CopyArr.push(temp);
-	}
-	return CopyArr;
-}
 
 const readline = require("readline");
+const { start } = require("repl");
 const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
 let input = [];
 rl.on("line", function (line) {
@@ -56,20 +50,17 @@ rl.on("line", function (line) {
 }).on("close", function () {
 	[n, e] = input[0].split(" ").map((value) => Number(value));
 	input = input.slice(1);
-	let arr;
+	let startPos = Number(input[0]);
+	input = input.slice(1);
 	arr = Array.from({ length: n }, () => Array.from({ length: n }, () => Infinity));
 
 	isVisited = Array.from({ length: n }, () => false);
 	for (let i = 0; i < e; i++) {
 		let temp = input[i].split(" ").map((value) => Number(value));
-		arr[temp[0] - 1][temp[1] - 1] = temp[2];
-		arr[temp[1] - 1][temp[0] - 1] = temp[2];
+		if (arr[temp[0] - 1][temp[1] - 1] > temp[2]) {
+			arr[temp[0] - 1][temp[1] - 1] = temp[2];
+			arr[temp[1] - 1][temp[0] - 1] = temp[2];
+		}
 	}
-	input[e].split(" ").map((value) => should.push(Number(value)));
-	console.log(arr);
-	console.log(should);
-	let result1 = solve(copyArray(arr), should[0], should[1]) + solve(copyArray(arr), 1, should[0]) + solve(copyArray(arr), should[1], arr.length);
-	let result2 = solve(copyArray(arr), should[1], should[0]) + solve(copyArray(arr), 1, should[1]) + solve(copyArray(arr), should[0], arr.length);
-	const result = result1 > result2 ? result2 : result1;
-	console.log(result === Infinity ? -1 : result);
+	solve(startPos);
 });
