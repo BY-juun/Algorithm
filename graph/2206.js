@@ -7,7 +7,7 @@ let dx = [1, 0, 0, -1];
 let dy = [0, 1, -1, 1];
 
 const solve = () => {
-  isVisited[0][0].visitied = 1;
+  isVisited[0][0].visited = 1;
   isVisited[0][0].count = 1;
   DFS(0, 0, 1, 0);
 };
@@ -27,13 +27,13 @@ const DFS = (xPos, yPos, count, isBreak) => {
         if (!graph[nextX][nextY]) {
           if (!isVisited[nextX][nextY].visited) {
             //아직 방문하지 않은 곳인 경우
-            isVisited[nextX][nextY].visitied = 1;
+            isVisited[nextX][nextY].visited = 1;
             isVisited[nextX][nextY].count = count + 1;
             DFS(nextX, nextY, count + 1, 1);
           } else {
             //방문한 경우, 이때는 isVisited count 체크
             if (count + 1 < isVisited[nextX][nextY].count) {
-              isVisited[nextX][nextY].visitied = 1;
+              isVisited[nextX][nextY].visited = 1;
               isVisited[nextX][nextY].count = count + 1;
               DFS(nextX, nextY, count + 1, 1);
             }
@@ -41,28 +41,26 @@ const DFS = (xPos, yPos, count, isBreak) => {
         }
       } else {
         //아직 벽을 깨지 않았을 경우
-        if (!isVisited[nextX][nextY]) {
+        if (!isVisited[nextX][nextY].visited) {
+          //방문하지 않았을 경우
           if (graph[nextX][nextY]) {
             //벽인경우
             isVisited[nextX][nextY].visited = 1;
             isVisited[nextX][nextY].count = count + 1;
+            graph[nextX][nextY] = 0;
             DFS(nextX, nextY, count + 1, 1);
+            graph[nextX][nextY] = 1;
           } else {
             isVisited[nextX][nextY].visited = 1;
             isVisited[nextX][nextY].count = count + 1;
             DFS(nextX, nextY, count + 1, 0);
           }
         } else {
+          //이미 방문했을 경우,
           if (count + 1 < isVisited[nextX][nextY].count) {
-            if (graph[nextX][nextY]) {
-              isVisited[nextX][nextY].visited = 1;
-              isVisited[nextX][nextY].count = count + 1;
-              DFS(nextX, nextY, count + 1, 1);
-            } else {
-              isVisited[nextX][nextY].visited = 1;
-              isVisited[nextX][nextY].count = count + 1;
-              DFS(nextX, nextY, count + 1, 0);
-            }
+            isVisited[nextX][nextY].visited = 1;
+            isVisited[nextX][nextY].count = count + 1;
+            DFS(nextX, nextY, count + 1, 0);
           }
         }
       }
@@ -80,7 +78,7 @@ rl.on("line", function (line) {
   isVisited = Array.from({ length: row }, () =>
     Array.from({ length: col }, () => {
       return {
-        visitied: 0,
+        visited: 0,
         count: Number.MAX_SAFE_INTEGER,
       };
     })
