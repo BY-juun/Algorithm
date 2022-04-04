@@ -45,6 +45,7 @@ const DFS = (xPos, yPos, count, isBreak) => {
           //방문하지 않았을 경우
           if (graph[nextX][nextY]) {
             //벽인경우
+
             isVisited[nextX][nextY].visited = 1;
             isVisited[nextX][nextY].count = count + 1;
             graph[nextX][nextY] = 0;
