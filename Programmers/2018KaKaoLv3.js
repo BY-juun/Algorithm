@@ -13,7 +13,6 @@ function solution(lines) {
 
 	let answer = 0;
 	let count = 0;
-	console.log(times);
 	for (const time of times) {
 		if (time[0] === 'START') count++;
 		else count--;
