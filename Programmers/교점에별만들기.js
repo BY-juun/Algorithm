@@ -57,8 +57,5 @@ function solution(line) {
     }
     answer.push(row.join(""));
   }
-
-  console.log(`x : ${min_X} ${max_X}`);
-  console.log(`y : ${min_Y} ${max_Y}`);
   return answer.reverse();
 }
