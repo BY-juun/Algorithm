@@ -3,47 +3,51 @@ class MinHeap {
   constructor() {
     this.heap = [];
   }
-  swap(a, b) {
-    const temp = this.heap[a];
-    this.heap[a] = this.heap[b];
-    this.heap[b] = temp;
-  }
-  push(value) {
-    this.heap.push(value);
-    let idx = this.heap.length - 1;
-    let parentIdx = Math.floor((idx - 1) / 2);
-
-    while (idx > 0 && this.heap[parentIdx] > this.heap[idx]) {
-      this.swap(idx, parentIdx);
-      idx = parentIdx;
-      parentIdx = Math.floor((idx - 1) / 2);
+  push(val) {
+    this.heap.push(val);
+    let curIdx = this.heap.length - 1;
+    let parentIdx = Math.floor((curIdx - 1) / 2);
+    const { heap } = this;
+    while (curIdx > 0 && heap[parentIdx] > heap[curIdx]) {
+      this.swap(parentIdx, curIdx);
+      curIdx = parentIdx;
+      parentIdx = Math.floor((curIdx - 1) / 2);
     }
   }
   pop() {
-    if (this.heap.length === 0) return undefined;
-    else if (this.heap.length === 1) return this.heap.pop();
+    const { heap } = this;
+    if (heap.length === 0) return undefined;
+    if (heap.length === 1) return heap.shift();
 
-    const result = this.heap[0];
-    this.heap[0] = this.heap.pop();
-
+    const result = heap[0];
+    heap[0] = heap.pop();
     let idx = 0;
 
     while (true) {
-      let leftParentIdx = idx * 2 + 1;
-      let rightParentIdx = idx * 2 + 2;
-      if (this.heap.length <= leftParentIdx) break;
+      const originIdx = idx;
+      let leftParentIdx = this.getLeftParentIdx(idx);
+      let rightParentIdx = this.getRightParentIdx(idx);
 
-      let nextIdx = idx;
-      if (this.heap[leftParentIdx] < this.heap[nextIdx]) nextIdx = leftParentIdx;
-      if (rightParentIdx < this.heap.length && this.heap[rightParentIdx] < this.heap[nextIdx]) nextIdx = rightParentIdx;
+      if (heap[leftParentIdx] < heap[idx]) idx = leftParentIdx;
+      if (heap[rightParentIdx] < heap[idx]) idx = rightParentIdx;
 
-      if (nextIdx === idx) break;
-
-      this.swap(idx, nextIdx);
-      idx = nextIdx;
+      if (idx === originIdx) break;
+      this.swap(originIdx, idx);
     }
-
     return result;
+  }
+
+  swap(idx1, idx2) {
+    const temp = this.heap[idx1];
+    this.heap[idx1] = this.heap[idx2];
+    this.heap[idx2] = temp;
+  }
+
+  getLeftParentIdx(idx) {
+    return idx * 2 + 1;
+  }
+  getRightParentIdx(idx) {
+    return idx * 2 + 2;
   }
 }
 
