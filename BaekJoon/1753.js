@@ -63,10 +63,7 @@ function solution(start, board, arr) {
     board[to].forEach((next) => {
       if (arr[next.to] > next.cost + arr[to]) {
         arr[next.to] = next.cost + arr[to];
-        minHeap.push({
-          to: next.to,
-          cost: arr[next.to],
-        });
+        minHeap.push(next);
       }
     });
   }

@@ -1,103 +1,74 @@
-class Heap {
+class MinHeap {
+  heap;
   constructor() {
-    this.items = [];
+    this.heap = [];
+  }
+  push(val) {
+    this.heap.push(val);
+    let curIdx = this.heap.length - 1;
+    let parentIdx = Math.floor((curIdx - 1) / 2);
+    while (curIdx > 0 && this.heap[parentIdx].cost < this.heap[curIdx].cost) {
+      this.swap(parentIdx, curIdx);
+      curIdx = parentIdx;
+      parentIdx = Math.floor((curIdx - 1) / 2);
+    }
+  }
+  pop() {
+    const { heap } = this;
+    if (heap.length === 0) return undefined;
+    if (heap.length === 1) return heap.shift();
+
+    const result = heap[0];
+    heap[0] = heap.pop();
+    let idx = 0;
+
+    while (true) {
+      const originIdx = idx;
+      let leftParentIdx = this.getLeftParentIdx(idx);
+      let rightParentIdx = this.getRightParentIdx(idx);
+      if (heap[leftParentIdx] && heap[leftParentIdx].cost < heap[idx].cost) idx = leftParentIdx;
+      if (heap[rightParentIdx] && heap[rightParentIdx].cost < heap[idx].cost) idx = rightParentIdx;
+
+      if (idx === originIdx) break;
+      this.swap(originIdx, idx);
+    }
+    return result;
   }
 
   swap(idx1, idx2) {
-    [this.items[idx1], this.items[idx2]] = [this.items[idx2], this.items[idx1]];
+    const temp = { ...this.heap[idx1] };
+    this.heap[idx1] = { ...this.heap[idx2] };
+    this.heap[idx2] = { ...temp };
   }
 
-  findParentIdx(idx) {
-    return Math.floor((idx - 1) / 2);
+  isEmpty() {
+    return this.heap.length === 0 ? true : false;
   }
 
-  findLeftChildIdx(idx) {
+  getLeftParentIdx(idx) {
     return idx * 2 + 1;
   }
-
-  findRightChildIdx(idx) {
+  getRightParentIdx(idx) {
     return idx * 2 + 2;
   }
-
-  findParent(idx) {
-    return this.items[this.findParentIdx(idx)];
-  }
-
-  findLeftChild(idx) {
-    return this.items[this.findLeftChildIdx(idx)];
-  }
-
-  findRightChild(idx) {
-    return this.items[this.findRightChildIdx(idx)];
-  }
-
-  peek() {
-    return this.items[0];
-  }
-
-  size() {
-    return this.items.length;
-  }
 }
 
-class MinHeap extends Heap {
-  bubbleUp() {
-    let index = this.items.length - 1;
-    while (this.findParent(index) && this.findParent(index).cost > this.items[index].cost) {
-      this.swap(index, this.findParentIdx(index));
-      index = this.findParentIdx(index);
-    }
-  }
-
-  bubbleDown() {
-    let index = 0;
-    while (
-      (this.findLeftChild(index) && this.findLeftChild(index).cost < this.items[index].cost) ||
-      (this.findRightChild(index) && this.findRightChild(index).cost < this.items[index].cost)
-    ) {
-      let smallerIndex = this.findLeftChildIdx(index);
-      if (this.findRightChild(index) && this.findRightChild(index).cost < this.items[smallerIndex].cost) {
-        smallerIndex = this.findRightChildIdx(index);
-      }
-
-      this.swap(index, smallerIndex);
-      index = smallerIndex;
-    }
-  }
-
-  add(value) {
-    this.items.push(value);
-    this.bubbleUp();
-  }
-  poll() {
-    if (this.items.length === 1) return this.items.pop();
-    const value = this.items[0];
-    this.items[0] = this.items.pop();
-    this.bubbleDown();
-
-    return value;
-  }
-}
-
-const Dijkstra = (start, adjList, V) => {
+function solve(start, end, arr, adj) {
   const minHeap = new MinHeap();
-  const dist = Array.from({ length: V }, () => Infinity);
-  dist[start] = 0;
-  minHeap.add({ to: start, cost: 0 });
-  while (minHeap.size()) {
-    const { to: vertex, cost } = minHeap.poll();
-    if (!adjList[vertex]) continue;
-    if (dist[vertex] < cost) continue;
-    for (const next of adjList[vertex]) {
-      const { to: nextVertex, cost: nextCost } = next;
-      if (dist[nextVertex] > cost + nextCost) {
-        dist[nextVertex] = cost + nextCost;
-        minHeap.add({ to: nextVertex, cost: cost + nextCost });
+  minHeap.push({ to: start, cost: 0 });
+  while (!minHeap.isEmpty()) {
+    const { to, cost } = minHeap.pop();
+    if (adj[to].length === 0) continue;
+    if (arr[to] < cost) continue;
+    adj[to].forEach((next) => {
+      if (arr[next.to] > cost + next.cost) {
+        arr[next.to] = cost + next.cost;
+        minHeap.push({ to: next.to, cost: arr[next.to] });
       }
-    }
+    });
   }
-  return dist;
-};
+  console.log(arr[end - 1]);
+}
 
 const readline = require("readline");
 const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
@@ -105,16 +76,15 @@ let input = [];
 rl.on("line", function (line) {
   input.push(line);
 }).on("close", function () {
-  const NumOfCity = Number(input[0]);
-  const NumOfBus = Number(input[1]);
+  const n = Number(input[0]);
+  const m = Number(input[1]);
   input = input.slice(2);
-  const Bus = Array.from({ length: NumOfCity }, () => []);
-  for (let i = 0; i < NumOfBus; i++) {
+  const arr = Array.from({ length: n }, () => Infinity);
+  const adj = Array.from({ length: n }, () => []);
+  for (let i = 0; i < m; i++) {
     const [start, end, cost] = input[i].split(" ").map(Number);
-    Bus[start - 1].push({ to: end - 1, cost });
+    adj[start - 1].push({ to: end - 1, cost });
   }
-  input = input.slice(NumOfBus);
-  const [start, dest] = input[0].split(" ").map(Number);
-  const answer = Dijkstra(start - 1, Bus, NumOfCity);
-  console.log(answer[dest - 1]);
+  const [start, end] = input[m].split(" ").map(Number);
+  solve(start - 1, end, arr, adj);
 });
