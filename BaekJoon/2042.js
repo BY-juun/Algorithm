@@ -28,7 +28,7 @@ rl.on("line", function (line) {
 
   const segmentTreeSum = (node, start, end, left, right) => {
     if (left > end || right < start) return 0;
-    if (left <= start && right >= end) return segmentTree[node];
+    if (left <= start && end <= right) return segmentTree[node];
     const middle = Math.floor((start + end) / 2);
     const LeftSum = segmentTreeSum(node * 2, start, middle, left, right);
     const RightSum = segmentTreeSum(node * 2 + 1, middle + 1, end, left, right);
