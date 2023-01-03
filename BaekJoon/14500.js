@@ -1,72 +1,54 @@
-const fs = require("fs");
-const filePath = process.platform === "linux" ? "/dev/stdin" : "input.txt";
-const input = fs.readFileSync(filePath).toString().trim().split("\n");
+let isVisited;
+const graph = [];
+let row;
+let col;
+let answer = Number.MIN_SAFE_INTEGER;
 
-const [n, m] = input.shift().split(" ").map(Number);
-const arr = input.map((i) => i.split(" ").map(Number));
-const visited = Array.from({ length: n }, () => Array.from({ length: m }, () => 0));
-const dx = [0, 0, 1, -1];
-const dy = [1, -1, 0, 0];
-const ddx = [
-  [0, 0, 0, 1],
-  [0, 1, 2, 1],
-  [0, 0, 0, -1],
-  [0, -1, 0, 1],
-];
-const ddy = [
-  [0, 1, 2, 1],
-  [0, 0, 0, 1],
-  [0, 1, 2, 1],
-  [0, 1, 1, 1],
-];
-let ans = 0;
+const dx = [-1, 0, 0, 1];
+const dy = [0, -1, 1, 0];
+const strToNum = (str) => str.split(" ").map(Number);
+const readline = require("readline");
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout,
+});
+let input = [];
+rl.on("line", function (line) {
+  input.push(line);
+}).on("close", async function () {
+  input.slice(1).forEach((row) => {
+    graph.push(strToNum(row));
+  });
+  solve();
+});
 
-const dfs = (x, y, sum, cnt) => {
-  if (cnt === 4) {
-    ans = Math.max(ans, sum);
-    return;
-  }
-  for (let i = 0; i < 4; i++) {
-    let [nx, ny] = [x + dx[i], y + dy[i]];
-    if (nx < 0 || nx >= n || ny < 0 || ny >= m) continue;
+function solve() {
+  row = graph.length;
+  col = graph[0].length;
+  isVisited = Array.from(
+    { length: row },
+    () => Array.from({ length: col }),
+    () => false
+  );
 
-    if (!visited[nx][ny]) {
-      visited[nx][ny] = true;
-      dfs(nx, ny, sum + arr[nx][ny], cnt + 1);
-      visited[nx][ny] = false;
+  for (let i = 0; i < row; i++) {
+    for (let j = 0; j < col; j++) {
+      isVisited[i][j] = true;
+      DFS(i, j, 0, 0);
+      isVisited[i][j] = false;
     }
-  }
-};
-
-const checkNoDfs = (x, y) => {
-  for (let i = 0; i < 4; i++) {
-    let flag = false;
-    let sum = 0;
-
-    for (let j = 0; j < 4; j++) {
-      let nx = x + ddx[i][j];
-      let ny = y + ddy[i][j];
-
-      if (nx < 0 || nx >= n || ny < 0 || ny >= m) {
-        flag = true;
-        break;
-      } else {
-        sum += arr[nx][ny];
-      }
-    }
-    if (!flag) {
-      ans = Math.max(ans, sum);
-    }
-  }
-};
-
-for (let i = 0; i < n; i++) {
-  for (let j = 0; j < m; j++) {
-    visited[i][j] = true;
-    dfs(i, j, arr[i][j], 1);
-    visited[i][j] = false;
-    checkNoDfs(i, j);
   }
 }
 
-console.log(ans);
+function DFS(i, j, sum, count) {
+  if (count === 4) return (answer = Math.max(sum, answer));
+  for (let dir = 0; dir < 4; dir++) {
+    const nextX = i + dx[dir];
+    const nextY = j + dy[dir];
+    if (nextX < 0 || nextX >= row || nextY < 0 || nextY >= col) continue;
+    if (isVisited[nextX][nextY]) continue;
+    isVisited[nextX][nextY] = true;
+    DFS(nextX, nextY, sum + graph[nextX][nextY], count + 1);
+    isVisited[nextX][nextY] = false;
+  }
+}
