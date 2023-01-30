@@ -29,9 +29,6 @@ function DFS(x, y, letters, n, m, r, c, k) {
     const nextLetter = letters + dirLetter;
     const dist = getDist(nextX, nextY, r - 1, c - 1);
     const remainDist = k - nextLetter.length;
-    console.log(x, y);
-    console.log(dist);
-    console.log(remainDist);
     if (remainDist < dist || remainDist % 2 !== dist % 2) continue;
     if (nextLetter <= answer || !answer) DFS(nextX, nextY, nextLetter, n, m, r, c, k);
   }
