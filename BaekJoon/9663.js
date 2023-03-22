@@ -1,27 +1,39 @@
-let n;
+let queenPos;
 let answer = 0;
-let pair = [];
-const solve = (idx) => {
-  if (idx === n) {
-    answer++;
-  }
-  for (let i = 0; i < n; i++) {
-    if (check([idx, i])) {
-      pair.push([idx, i]);
-      solve(idx + 1);
-      pair.pop();
-    }
-  }
-};
 
-const check = ([x, y]) => {
-  for (let temp of pair) {
-    let [pairX, pairY] = temp;
-    if (pairX === x || pairY === y) return false;
-    if (Math.abs((pairX - x) / (pairY - y)) === 1) return false;
+function isOtherQueenInSameStraightLine(curX, curY) {
+  for (const [x, y] of queenPos) {
+    if (x === curX || y === curY) return true;
   }
-  return true;
-};
+  return false;
+}
+
+function isOtherQueenInSameDiagonalLine(curX, curY) {
+  for (const [x, y] of queenPos) {
+    if (Math.abs(x - curX) === Math.abs(y - curY)) return true;
+  }
+  return false;
+}
+
+function DFS(curRow, n) {
+  if (curRow === n) return answer++;
+
+  for (let col = 0; col < n; col++) {
+    if (isOtherQueenInSameStraightLine(curRow, col)) continue;
+    if (isOtherQueenInSameDiagonalLine(curRow, col)) continue;
+    queenPos.push([curRow, col]);
+    DFS(curRow + 1, n);
+    queenPos.pop();
+  }
+}
+
+function solve(n) {
+  for (let col = 0; col < n; col++) {
+    queenPos = [[0, col]];
+    DFS(1, n);
+  }
+  console.log(answer);
+}
 
 const readline = require("readline");
 const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
@@ -30,6 +42,5 @@ rl.on("line", function (line) {
   input.push(line);
 }).on("close", function () {
   n = Number(input[0]);
-  solve(0);
-  console.log(answer);
+  solve(n);
 });
