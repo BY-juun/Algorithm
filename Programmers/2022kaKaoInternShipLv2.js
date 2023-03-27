@@ -1,36 +1,39 @@
 const sum = (arr) => arr.reduce((acc, cur) => acc + cur, 0);
 const isInteger = (num) => (Math.floor(num) !== num ? false : true);
-const isOrigin = (leftIdx, leftOriginIdx, halfIdx, halfOriginIdx) => leftIdx === leftOriginIdx && halfIdx === halfOriginIdx;
+const isOrigin = (leftIdx, leftOriginIdx, halfIdx, halfOriginIdx) =>
+  leftIdx === leftOriginIdx && halfIdx === halfOriginIdx;
 
 function solution(queue1, queue2) {
   var answer = 0;
-  const queue = [...queue1, ...queue2];
-  const halfSum = sum(queue) / 2;
-
-  if (!isInteger(halfSum)) return -1;
-
-  const length = queue.length;
-
-  const leftOriginIdx = 0;
-  const halfOriginIdx = queue1.length - 1;
+  const queueLength = queue1.length;
+  let leftSum = sum(queue1);
+  let rightSum = sum(queue2);
+  const goal = (leftSum + rightSum) / 2;
+  const totalQueue = [...queue1, ...queue2];
 
   let leftIdx = 0;
-  let halfIdx = queue1.length - 1;
+  let middleIdx = queueLength - 1;
 
-  let leftSum = sum(queue1);
+  let leftOriginIdx = leftIdx;
+  let middleOriginIdx = middleIdx;
+
+  if (!isInteger(goal)) return -1;
 
   while (true) {
-    if (leftSum === halfSum) break;
-    else if (leftSum < halfSum) {
-      halfIdx = (halfIdx + 1) % length;
-      leftSum += queue[halfIdx];
+    if (leftSum === goal) return answer;
+
+    if (leftSum < goal) {
+      middleIdx = (middleIdx + 1) % totalQueue.length;
+      leftSum += totalQueue[middleIdx];
     } else {
-      leftSum -= queue[leftIdx];
-      leftIdx = (leftIdx + 1) % length;
+      leftSum -= totalQueue[leftIdx];
+      leftIdx = (leftIdx + 1) % totalQueue.length;
     }
 
-    if (isOrigin(leftIdx, leftOriginIdx, halfIdx, halfOriginIdx)) return -1;
-    if (leftIdx > halfIdx) return -1;
+    if (leftIdx === leftOriginIdx && middleIdx === middleOriginIdx) return -1;
+
+    if (leftIdx > middleIdx) return -1;
+
     answer++;
   }
 

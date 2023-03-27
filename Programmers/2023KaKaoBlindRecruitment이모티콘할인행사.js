@@ -1,52 +1,44 @@
-const AllEmoticonCase = [];
-const discountRate = [10, 20, 30, 40];
+const discountRates = [10, 20, 30, 40];
 
 function solution(users, emoticons) {
-  findAllEmoticonsCase(0, emoticons, []);
-  const answer = findAnswer(users);
-  return answer;
-}
+  let answer = null;
 
-function findAllEmoticonsCase(curIdx, emoticons, accEmoticons) {
-  if (curIdx === emoticons.length) {
-    AllEmoticonCase.push(accEmoticons);
-    return;
-  }
-  discountRate.forEach((rate) => {
-    findAllEmoticonsCase(curIdx + 1, emoticons, [...accEmoticons, { price: emoticons[curIdx], rate }]);
-  });
-}
+  const compareAnswer = (candidate) => {
+    if (!answer) return (answer = candidate);
 
-function findAnswer(users) {
-  let answer = [0, 0];
-  AllEmoticonCase.forEach((emoticonCase) => {
+    if (answer[0] > candidate[0]) return;
+    else if (answer[0] < candidate[0]) answer = candidate;
+    else {
+      answer = answer[1] > candidate[1] ? answer : candidate;
+    }
+  };
+
+  const do_simulate = (candidate) => {
     const result = [0, 0];
     users.forEach((user) => {
-      let accPrice = 0;
-      const [userLimitRate, userLimitSubscribePrice] = user.map(Number);
+      let userTotalPrice = 0;
+      const [limitDiscount, limitSubscribePrice] = user;
 
-      emoticonCase.forEach((emoticon) => {
-        const { rate, price } = emoticon;
-        if (rate >= userLimitRate) accPrice += (price / 100) * (100 - rate);
+      candidate.forEach(({ price, discountRate }) => {
+        if (discountRate >= limitDiscount) userTotalPrice += price;
       });
 
-      if (accPrice >= userLimitSubscribePrice) {
-        result[0]++;
-        accPrice = 0;
-      }
-
-      result[1] += accPrice;
+      if (userTotalPrice >= limitSubscribePrice) result[0]++;
+      else result[1] += userTotalPrice;
     });
+    compareAnswer(result);
+  };
 
-    answer = compareGoal(answer, result);
-  });
+  const recursive = (curIdx, accArr) => {
+    if (curIdx === emoticons.length) return do_simulate(accArr);
+
+    discountRates.forEach((discountRate) => {
+      const price = Math.floor((emoticons[curIdx] * (100 - discountRate)) / 100);
+      recursive(curIdx + 1, [...accArr, { price, discountRate }]);
+    });
+  };
+
+  recursive(0, []);
+
   return answer;
-}
-
-function compareGoal(a, b) {
-  if (a[0] > b[0]) return a;
-  if (a[0] < b[0]) return b;
-
-  if (a[1] > b[1]) return a;
-  return b;
 }
