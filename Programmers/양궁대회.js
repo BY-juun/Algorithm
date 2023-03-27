@@ -1,64 +1,71 @@
-let maxScoreGap = Number.MIN_SAFE_INTEGER;
-let answer = [];
-const MAX_SCORE = 10;
-const SAME_SCORE = 0;
+function solution(n, appeach) {
+  let currentScoreGap = Number.MIN_SAFE_INTEGER;
+  var answer = [];
 
-function isLastIdx(idx, length) {
-  return idx === length - 1 ? true : false;
-}
-
-function isScoreExist(lion, appeach) {
-  return lion === 0 && appeach === 0 ? false : true;
-}
-
-function isEnd(idx, length) {
-  return idx === length ? true : false;
-}
-
-function compareSameScore(scores) {
-  for (let i = scores.length - 1; i >= 0; i--) {
-    if (scores[i] > answer[i]) return true;
-    else if (scores[i] < answer[i]) return false;
-  }
-  return false;
-}
-
-function compareScore(ryan, appeach) {
-  let lionScore = 0;
-  let appeachScore = 0;
-  for (let i = 0; i < ryan.length; i++) {
-    const score = MAX_SCORE - i;
-    if (!isScoreExist(ryan[i], appeach[i])) continue;
-    if (ryan[i] > appeach[i]) lionScore += score;
-    else appeachScore += score;
-  }
-  return lionScore > appeachScore ? { isRyanWin: true, scoreGap: lionScore - appeachScore } : { isRyanWin: false, scoreGap: 0 };
-}
-
-function DFS(idx, remainedArrows, ryan, appeach) {
-  if (isEnd(idx, appeach.length)) {
-    const { isRyanWin, scoreGap } = compareScore(ryan, appeach);
-    if (!isRyanWin) return;
-
-    if (maxScoreGap > scoreGap) return;
-    if (maxScoreGap < scoreGap) {
-      maxScoreGap = scoreGap;
-      return (answer = [...ryan]);
-    }
-    if (compareSameScore(ryan)) {
-      maxScoreGap = scoreGap;
-      answer = [...ryan];
+  const getWinnerAndScoreGap = (ryan) => {
+    let ryanTotalScore = 0;
+    let appeachTotalScore = 0;
+    for (let i = 0; i < 11; i++) {
+      const currentScore = 10 - i;
+      if (!ryan[i] && !appeach[i]) continue;
+      if (ryan[i] > appeach[i]) ryanTotalScore += currentScore;
+      else appeachTotalScore += currentScore;
     }
 
-    return;
-  }
-  const requiredArrows = appeach[idx] + 1;
-  if (isLastIdx(idx, appeach.length)) return DFS(idx + 1, 0, [...ryan, remainedArrows], appeach);
-  if (requiredArrows <= remainedArrows) DFS(idx + 1, remainedArrows - requiredArrows, [...ryan, requiredArrows], appeach);
-  DFS(idx + 1, remainedArrows, [...ryan, 0], appeach);
-}
+    const scoreGap = Math.abs(ryanTotalScore - appeachTotalScore);
 
-function solution(n, info) {
-  DFS(0, n, [], info);
+    return ryanTotalScore > appeachTotalScore ? { winner: "ryan", scoreGap } : { winner: "appeach", scoreGap };
+  };
+
+  const compareWithMinScore = (ryan) => {
+    for (let i = 10; i >= 0; i--) {
+      if (ryan[i] > answer[i]) return true;
+      else if (ryan[i] < answer[i]) return false;
+    }
+    return false;
+  };
+
+  const compareRyanAndAppeach = (ryan) => {
+    const { winner, scoreGap } = getWinnerAndScoreGap(ryan);
+
+    if (winner === "appeach") return;
+    if (currentScoreGap === scoreGap) {
+      const isCurrentRyanRecordIsHigher = compareWithMinScore(ryan);
+      if (isCurrentRyanRecordIsHigher) answer = ryan;
+    } else {
+      if (currentScoreGap < scoreGap) {
+        currentScoreGap = scoreGap;
+        answer = ryan;
+      }
+    }
+  };
+
+  const DFS = (accArr, curIdx, remainArrow) => {
+    if (remainArrow === 0) return compareRyanAndAppeach(accArr);
+    if (curIdx === 11) {
+      accArr[10] = remainArrow;
+      return compareRyanAndAppeach(accArr);
+    }
+
+    const numberOfAppeachShoot = appeach[curIdx];
+
+    if (remainArrow >= numberOfAppeachShoot + 1) {
+      accArr[curIdx] = numberOfAppeachShoot + 1;
+      DFS([...accArr], curIdx + 1, remainArrow - accArr[curIdx]);
+    }
+
+    accArr[curIdx] = 0;
+    DFS([...accArr], curIdx + 1, remainArrow);
+  };
+
+  DFS(
+    Array.from({ length: 11 }, () => 0),
+    0,
+    n
+  );
   return answer.length === 0 ? [-1] : answer;
 }
+
+const answer = solution(10, [0, 0, 0, 0, 0, 0, 0, 0, 3, 4, 3]);
+
+console.log(answer);
