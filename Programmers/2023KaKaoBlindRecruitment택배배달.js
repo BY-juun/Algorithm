@@ -1,10 +1,9 @@
 function solution(cap, n, deliveries, pickups) {
   var answer = 0;
-  let isAllClear = false;
   let deliveryCurIdx = n - 1;
   let pickUpCurIdx = n - 1;
 
-  while (!isAllClear) {
+  while (true) {
     const [furthestDeliveryHouse, nextDevlieryIdx] = findFurthestHouse(deliveries, cap, deliveryCurIdx);
     const [furthestPickUpHouse, nextPickUpIdx] = findFurthestHouse(pickups, cap, pickUpCurIdx);
 
