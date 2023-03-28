@@ -35,3 +35,5 @@ function addDummy(dec) {
 
   return "0".repeat(targetLen) + dec;
 }
+
+solution([63]);

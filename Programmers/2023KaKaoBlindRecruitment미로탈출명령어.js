@@ -1,36 +1,55 @@
 const dx = [1, 0, 0, -1];
 const dy = [0, -1, 1, 0];
+const START = "START";
+const END = "END";
 const dl = ["d", "l", "r", "u"];
-let graph;
-let answer = null;
-const getDist = (x1, y1, x2, y2) => Math.abs(x1 - x2) + Math.abs(y1 - y2);
 
 function solution(n, m, x, y, r, c, k) {
-  graph = Array.from({ length: n }, () => Array.from({ length: m }, () => null));
-  graph[x - 1][y - 1] = "START";
-  graph[r - 1][c - 1] = "END";
+  let graph;
+  let answer = null;
 
-  DFS(x - 1, y - 1, "", n, m, r, c, k);
+  const InitGraph = () => {
+    const graph = Array.from({ length: n }, () => Array.from({ length: m }, () => null));
+    graph[x - 1][y - 1] = START;
+    graph[r - 1][c - 1] = END;
+    return graph;
+  };
+
+  const isInGraph = (curX, curY) => {
+    if (curX < 0 || curY < 0 || curX >= n || curY >= m) return false;
+    return true;
+  };
+
+  const getRemainDist = (curX, curY) => Math.abs(curX - (r - 1)) + Math.abs(curY - (c - 1));
+
+  const DFS = (curX, curY, accStr) => {
+    if (accStr.length === k) {
+      if (graph[curX][curY] === END) answer = answer < accStr ? answer : accStr;
+      return;
+    }
+
+    for (let dir = 0; dir < 4; dir++) {
+      const nextX = curX + dx[dir];
+      const nextY = curY + dy[dir];
+      const dirLetter = dl[dir];
+
+      if (!isInGraph(nextX, nextY)) continue;
+      const nextLetter = accStr + dirLetter;
+      const remainDist = getRemainDist(nextX, nextY);
+      const remainLimitDist = k - nextLetter.length;
+
+      if (remainLimitDist < remainDist) continue;
+      if (remainLimitDist % 2 !== remainDist % 2) continue;
+      if (answer) break;
+
+      DFS(nextX, nextY, nextLetter);
+    }
+  };
+
+  graph = InitGraph();
+  DFS(x - 1, y - 1, "");
 
   return answer ? answer : "impossible";
 }
 
-function DFS(x, y, letters, n, m, r, c, k) {
-  if (letters.length === k) {
-    if (graph[x][y] === "END") answer = answer < letters ? answer : letters;
-    return;
-  }
-  for (let dir = 0; dir < 4; dir++) {
-    const nextX = x + dx[dir];
-    const nextY = y + dy[dir];
-    const dirLetter = dl[dir];
-
-    if (nextX < 0 || nextX >= n || nextY < 0 || nextY >= m) continue;
-    const nextLetter = letters + dirLetter;
-    const dist = getDist(nextX, nextY, r - 1, c - 1);
-    const remainDist = k - nextLetter.length;
-    if (remainDist < dist || remainDist % 2 !== dist % 2) continue;
-    if (nextLetter <= answer || !answer) DFS(nextX, nextY, nextLetter, n, m, r, c, k);
-  }
-}
 console.log(solution(3, 4, 2, 3, 3, 1, 5));
