@@ -26,13 +26,9 @@ function solution(info, edges) {
     newPossibles.splice(currentIdx, 1);
 
     for (const nextNode of newPossibles) {
-      dfs(nextNode, sheep, wolf, newPossibles);
+      //dfs(ne);
     }
   }
-
-  dfs(0, 0, 0, [0]); // DFS를 사용해 모든 경로를 탐색
-
-  return answer; // 모든 경로를 탐색후 최대 값인 answer를 반환
 }
 
 console.log(
@@ -53,3 +49,5 @@ console.log(
     ]
   )
 );
+
+채ㅜ내;
