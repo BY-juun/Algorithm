@@ -1,39 +1,38 @@
-let n;
-let arr;
-const solve = () => {
-  let dp = Array.from({ length: n }, () => 0);
-  for (let i = 0; i < dp.length; i++) {
-    const leftArr = arr.slice(0, i);
-    const rightArr = arr.slice(i + 1).reverse();
-    const left = findMaxIncrease(arr[i], leftArr);
-    const right = findMaxIncrease(arr[i], rightArr);
+const convertStrToNum = (str) => str.split(' ').map(Number);
+const readline = require('readline');
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout,
+});
+let input = [];
+rl.on('line', function (line) {
+  input.push(line);
+}).on('close', function () {
+  solution(convertStrToNum(input[1]));
+});
 
-    dp[i] = left + right + 1;
-  }
-  console.log(Math.max(...dp));
-};
+function solution(arr) {
+  const length = arr.length;
+  const dp_i = Array.from({ length }, () => 1);
+  const dp_d = Array.from({ length }, () => 1);
 
-const findMaxIncrease = (pivot, arr) => {
-  const temp = arr.filter((value) => value < pivot);
-  if (temp.length === 0) return 0;
-  let length = Array.from({ length: temp.length }, () => 1);
-  for (let i = 0; i < temp.length; i++) {
+  for (let i = 0; i < length; i++) {
     for (let j = 0; j < i; j++) {
-      if (temp[j] < temp[i]) {
-        length[i] = Math.max(length[i], length[j] + 1);
-      }
+      if (arr[i] > arr[j]) dp_i[i] = Math.max(dp_i[j] + 1, dp_i[i]);
     }
   }
-  return Math.max(...length);
-};
 
-const readline = require("readline");
-const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
-let input = [];
-rl.on("line", function (line) {
-  input.push(line);
-}).on("close", function () {
-  n = Number(input[0]);
-  arr = input[1].split(" ").map((value) => Number(value));
-  solve();
-});
+  for (let i = length - 1; i >= 0; i--) {
+    for (let j = length - 1; j > i; j--) {
+      if (arr[i] > arr[j]) dp_d[i] = Math.max(dp_d[j] + 1, dp_d[i]);
+    }
+  }
+
+  let answer = Number.MIN_SAFE_INTEGER;
+
+  for (let i = 0; i < length; i++) {
+    answer = Math.max(answer, dp_d[i] + dp_i[i] - 1);
+  }
+
+  console.log(answer);
+}
