@@ -1,35 +1,48 @@
-function solution(target, blocks) {
-  if (blocks.length < 2) return console.log("danger");
-  let start = 0;
-  let end = blocks.length - 1;
-
-  while (true) {
-    if (blocks[start] + blocks[end] === target) return console.log(`yes ${blocks[start]} ${blocks[end]}`);
-    else if (blocks[start] + blocks[end] > target) end -= 1;
-    else if (blocks[start] + blocks[end] < target) start += 1;
-    if (start >= end) return console.log("danger");
-  }
-}
-
-const readline = require("readline");
-const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+/* eslint-disable no-undef */
+/* eslint-disable @typescript-eslint/no-var-requires */
+const strToNum = (str) => str.split(' ').map(Number);
+const readline = require('readline');
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout,
+});
 let input = [];
-rl.on("line", function (line) {
+rl.on('line', function (line) {
   input.push(line);
-}).on("close", function () {
-  while (input.length !== 0) {
-    const hole = Number(input[0]);
-    input = input.slice(1);
-    const NumOfBlock = Number(input[0]);
-    input = input.slice(1);
-    const Blocks = [];
-    for (let i = 0; i < NumOfBlock; i++) {
-      Blocks.push(Number(input[i]));
+}).on('close', function () {
+  let i = 0;
+
+  while (i < input.length) {
+    let hole = Number(input[i++]);
+    let legoCount = Number(input[i++]);
+    const legoArr = [];
+    for (let j = 0; j < legoCount; j++) {
+      legoArr.push(Number(input[i]));
+      i++;
     }
-    input = input.slice(NumOfBlock);
     solution(
       hole * 10000000,
-      Blocks.sort((a, b) => a - b)
+      legoArr.sort((a, b) => a - b),
     );
   }
 });
+
+function solution(hole, legoArr) {
+  let answer = null;
+  let left = 0;
+  let right = legoArr.length - 1;
+
+  while (left <= right) {
+    let mid = Math.floor((left + right) / 2);
+    const sum = legoArr[left] + legoArr[right];
+
+    if (sum === hole)
+      return console.log(`yes ${legoArr[left]} ${legoArr[right]}`);
+
+    if (sum < hole) left = mid + 1;
+    else right = mid - 1;
+  }
+
+  if (answer) console.log(`yes ${answer[0]} ${answer[1]}`);
+  else console.log('danger');
+}
