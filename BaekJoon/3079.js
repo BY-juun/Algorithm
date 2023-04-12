@@ -20,17 +20,16 @@ function solution(m, arr) {
   let left = 0;
   let right = Math.max(...arr) * m;
 
-  while (left <= right) {
+  while (left + 1 < right) {
     let mid = Math.floor((right + left) / 2);
-
-    const canHandleCount = arr.reduce(
-      (acc, cur) => acc + Math.floor(mid / cur),
-      0
-    );
-
-    if (canHandleCount < m) left = mid + 1;
-    else right = mid - 1;
+    if (check(mid) === check(left)) left = mid;
+    else right = mid;
   }
 
-  console.log(right + 1);
+  console.log(right);
+
+  function check(time) {
+    const sum = time === 0 ? 0 : arr.reduce((acc, cur) => acc + Math.floor(time / cur), 0);
+    return sum >= m;
+  }
 }
