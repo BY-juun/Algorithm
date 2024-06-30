@@ -85,19 +85,20 @@ let input = [];
 rl.on("line", function (line) {
   input.push(line);
 }).on("close", function () {
-  const n = Number(input[0]);
-  const m = Number(input[1]);
-  input = input.slice(2);
+  const [n, m, x] = input[0].split(" ").map(Number);
   const adj = Array.from({ length: n }, () => []);
-  for (let i = 0; i < m; i++) {
-    const [start, end, cost] = input[i].split(" ").map(Number);
+  const reverse_adj = Array.from({ length: n }, () => []);
+
+  input.slice(1).forEach((line) => {
+    const [start, end, cost] = line.split(" ").map(Number);
     adj[start - 1].push({ to: end - 1, cost });
-  }
-  const [start, end] = input[m].split(" ").map(Number);
-  solve(start - 1, end - 1, adj);
+    reverse_adj[end - 1].push({ to: start - 1, cost });
+  });
+
+  solve(adj, reverse_adj, x - 1);
 });
 
-function solve(start, end, adj) {
+function dijkstra(adj, start) {
   const dist = Array.from({ length: adj.length }, () => Infinity);
   dist[start] = 0;
 
@@ -110,13 +111,28 @@ function solve(start, end, adj) {
     if (!adj[vertex]) continue;
     if (dist[vertex] < currentCost) continue;
 
-    adj[vertex].forEach(({ to, cost: nextCost }) => {
-      if (dist[to] > currentCost + nextCost) {
-        dist[to] = currentCost + nextCost;
-        minHeap.add([to, currentCost + nextCost]);
+    adj[vertex].forEach(({ cost: nextCost, to: nextVertex }) => {
+      if (dist[nextVertex] > currentCost + nextCost) {
+        dist[nextVertex] = currentCost + nextCost;
+        minHeap.add([nextVertex, currentCost + nextCost]);
       }
     });
   }
 
-  console.log(dist[end]);
+  return dist;
+}
+
+function solve(adj, reverse_adj, x) {
+  //x에서 n번마을까지
+  const dist1 = dijkstra(adj, x);
+
+  //n에서 x번마을까지
+  const dist2 = dijkstra(reverse_adj, x);
+
+  let answer = Number.MIN_SAFE_INTEGER;
+
+  for (let i = 0; i < dist1.length; i++) {
+    answer = Math.max(answer, dist1[i] + dist2[i]);
+  }
+  console.log(answer);
 }
