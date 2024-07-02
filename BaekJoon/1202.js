@@ -1,22 +1,24 @@
+//위상정렬 + 우선순위큐
 class Node {
-  constructor(v) {
+  constructor(v, w) {
     this.v = v;
+    this.w = w;
   }
 }
 
-class MinHeap {
+class MaxHeap {
   heap;
   constructor() {
     this.heap = [];
   }
 
-  push(value) {
-    this.heap.push(new Node(value));
+  push(v, w) {
+    this.heap.push(new Node(v, w));
 
     let idx = this.heap.length - 1;
     let parentIdx = this.getParentIdx(idx);
 
-    while (idx > 0 && this.heap[idx].v < this.heap[parentIdx].v) {
+    while (idx > 0 && this.heap[idx].v > this.heap[parentIdx].v) {
       this.swap(idx, parentIdx);
       idx = parentIdx;
       parentIdx = this.getParentIdx(idx);
@@ -43,12 +45,12 @@ class MinHeap {
     while (true) {
       if (
         leftChildIdx < this.heap.length &&
-        this.heap[idx].v > this.heap[leftChildIdx].v
+        this.heap[idx].v < this.heap[leftChildIdx].v
       )
         idx = leftChildIdx;
       if (
         rightChildIdx < this.heap.length &&
-        this.heap[idx].v > this.heap[rightChildIdx].v
+        this.heap[idx].v < this.heap[rightChildIdx].v
       )
         idx = rightChildIdx;
 
@@ -80,21 +82,6 @@ class MinHeap {
   }
 }
 
-function solve(pair) {
-  const minHeap = new MinHeap();
-  pair.forEach((card) => minHeap.push(card));
-
-  let answer = 0;
-
-  while (minHeap.size() > 1) {
-    const count = minHeap.pop().v + minHeap.pop().v;
-    answer += count;
-    minHeap.push(count);
-  }
-
-  console.log(answer);
-}
-
 const readline = require("readline");
 const rl = readline.createInterface({
   input: process.stdin,
@@ -104,6 +91,40 @@ let input = [];
 rl.on("line", function (line) {
   input.push(line);
 }).on("close", function () {
-  const pair = input.slice(1).map(Number);
-  solve(pair);
+  const [n, k] = input[0].split(" ").map(Number);
+  const gems = input.slice(1, n + 1).map((row) => {
+    return row.split(" ").map(Number);
+  });
+  const bags = input
+    .slice(n + 1, n + k + 1)
+    .map((limit) => ({ limit: Number(limit), result: 0 }));
+
+  solution(gems, bags);
 });
+
+function solution(gems, bags) {
+  const maxHeap = new MaxHeap();
+
+  gems.forEach(([w, v]) => {
+    maxHeap.push(v, w);
+  });
+
+  while (maxHeap.size()) {
+    const { v, w } = maxHeap.pop();
+
+    const idx = bags.findIndex(
+      ({ limit, result }) => result === 0 && limit >= w
+    );
+
+    if (idx !== -1) {
+      bags[idx].result = v;
+    }
+  }
+
+  console.log(
+    bags
+      .filter((v) => v.result !== 0)
+      .map((v) => v.result)
+      .reduce((acc, cur) => acc + cur, 0)
+  );
+}
